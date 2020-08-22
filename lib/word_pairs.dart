@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildRow(WordPair pair) {
-    final alreadySaved = _savedWordPairs.contains(pair);
+    final _alreadySaved = _savedWordPairs.contains(pair);
 
     return ListTile(
       title: Text(
@@ -53,12 +53,12 @@ class _HomePageState extends State<HomePage> {
         style: TextStyle(fontSize: 18),
       ),
       trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
+        _alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: _alreadySaved ? Colors.red : null,
       ),
       onTap: () {
         setState(() {
-          if (alreadySaved) {
+          if (_alreadySaved) {
             _savedWordPairs.remove(pair);
           } else {
             _savedWordPairs.add(pair);
@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
 
         return Scaffold(
             appBar: AppBar(
-              title: Text('Saved'),
+              title: Text('Bookmarks'),
             ),
             body: ListView(
               children: divided,

@@ -1,4 +1,4 @@
-# demo
+# Browser Bookmarks App
 
 A new Flutter project.
 
@@ -20,5 +20,8 @@ samples, guidance on mobile development, and a full API reference.
 How to create WebView screen
 https://stackoverflow.com/questions/60343925/webview-dont-work-in-flutter-errorflutter-lib-ui-ui-dart-state-cc157
 
-Fade
+Fade Transition
 https://www.woolha.com/tutorials/flutter-using-fadetransition-widget-examples
+
+Opening URL in Browser
+https://www.woolha.com/tutorials/flutter-open-url-examples

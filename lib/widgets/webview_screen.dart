@@ -56,7 +56,10 @@ class _WebViewScreenState extends State<WebViewScreen>
           visible: _isLoading,
           child: Align(
               alignment: Alignment.topCenter,
-              child: LinearProgressIndicator())),
+              child: LinearProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                backgroundColor: Colors.blue,
+              ))),
     ]));
   }
 }
