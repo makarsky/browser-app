@@ -19,12 +19,10 @@ class _HomePageState extends State<HomePage> {
   final _savedWordPairs = Set<WordPair>();
 
   _HomePageState() {
-    _children.add(buildList());
     _children.add(
-      WebViewScreen(
-        startUrl: 'https://medium.com/nonstopio/tagged/mobile-app-development',
-      ),
+      WebViewScreen(),
     );
+    _children.add(buildList());
   }
 
   Widget buildList() {

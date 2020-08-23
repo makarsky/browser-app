@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './word_pairs.dart';
+import './widgets/webview_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
         }),
       ),
-      home: HomePage(title: 'Bookmarks'),
+      home: WebViewScreen(),
     );
   }
 }
