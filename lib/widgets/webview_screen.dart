@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
+import '../classes/constants.dart';
 
 class WebViewScreen extends StatefulWidget {
   @override
@@ -59,7 +60,7 @@ class _WebViewScreenState extends State<WebViewScreen>
 
         return Scaffold(
             appBar: AppBar(
-              title: Text('Bookmarks'),
+              title: Text(Constants.SETTINGS_BOOKMARKS),
             ),
             body: ListView(
               children: divided,
@@ -82,6 +83,7 @@ class _WebViewScreenState extends State<WebViewScreen>
             style: TextStyle(fontSize: 14),
             autofocus: false,
             keyboardType: TextInputType.url,
+            maxLines: 1,
             controller: _textEditingController,
             decoration: new InputDecoration(
                 filled: true,
@@ -98,16 +100,25 @@ class _WebViewScreenState extends State<WebViewScreen>
                   ),
                   borderSide: BorderSide(color: Colors.white),
                 ),
+                isDense: true,
                 contentPadding: const EdgeInsets.only(
-                    top: 0.0, bottom: 0.0, left: 12.0, right: 12.0))),
+                    top: 10.0, bottom: 10.0, left: 12.0, right: 12.0))),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.forward),
             onPressed: _pushSaved,
           ),
-          IconButton(
-            icon: Icon(Icons.history),
-            onPressed: _pushSaved,
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert),
+            onSelected: (String s) => print(s),
+            itemBuilder: (BuildContext context) {
+              return Constants.SETTINGS.keys.map((key) {
+                return PopupMenuItem(
+                  child: Text(Constants.SETTINGS[key]),
+                  value: Constants.SETTINGS[key],
+                );
+              }).toList();
+            },
           ),
         ],
       ),
