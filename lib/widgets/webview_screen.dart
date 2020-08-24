@@ -15,25 +15,32 @@ class _WebViewScreenState extends State<WebViewScreen>
   final _formKey = GlobalKey<FormState>();
   TextEditingController _textEditingController = TextEditingController();
 
-  final _history = <String>[];
   final Set<String> _bookmarks = Set<String>();
   bool _isLoading = true;
   String _currentUrl =
       'https://medium.com/nonstopio/tagged/mobile-app-development';
+  bool _isCurrentUrlInBookmarks = false;
+  bool _canGoBack = false;
+  bool _canGoForward = false;
 
   @override
   void initState() {
     super.initState();
 
-    _history.add(_currentUrl);
     _textEditingController.value = TextEditingValue(text: _currentUrl);
   }
 
   void onPageStarted(String url) {
-    _history.add(url);
     setState(() {
       _isLoading = true;
       _currentUrl = url;
+      _isCurrentUrlInBookmarks = _bookmarks.contains(_currentUrl);
+    });
+    setState(() async {
+      _canGoBack = await _controller.future
+          .then((WebViewController controller) => controller.canGoBack());
+      _canGoForward = await _controller.future
+          .then((WebViewController controller) => controller.canGoForward());
     });
   }
 
@@ -43,10 +50,24 @@ class _WebViewScreenState extends State<WebViewScreen>
     });
   }
 
-  void _pushSaved() {
+  void _addCurrentUrlToBookmarks() {
+    setState(() {
+      _bookmarks.add(_currentUrl);
+      _isCurrentUrlInBookmarks = true;
+    });
+  }
+
+  void _removeCurrentUrlFromBookmarks() {
+    setState(() {
+      _bookmarks.remove(_currentUrl);
+      _isCurrentUrlInBookmarks = false;
+    });
+  }
+
+  void _viewBookmarks() {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (BuildContext context) {
-        final Iterable<ListTile> tiles = _history.map((String url) {
+        final Iterable<ListTile> tiles = _bookmarks.map((String url) {
           return ListTile(
             title: Text(
               url,
@@ -67,12 +88,6 @@ class _WebViewScreenState extends State<WebViewScreen>
             ));
       },
     ));
-  }
-
-  void onTabTapped(int index) {
-    setState(() {
-      print(index);
-    });
   }
 
   @override
@@ -106,7 +121,7 @@ class _WebViewScreenState extends State<WebViewScreen>
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.forward),
-            onPressed: _pushSaved,
+            onPressed: () {},
           ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
@@ -146,21 +161,39 @@ class _WebViewScreenState extends State<WebViewScreen>
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            FutureBuilder<WebViewController>(
+                future: _controller.future,
+                builder: (BuildContext context,
+                    AsyncSnapshot<WebViewController> controller) {
+                  return IconButton(
+                    disabledColor: Colors.grey,
+                    icon: Icon(Icons.chevron_left),
+                    onPressed: _canGoBack ? controller.data.goBack : null,
+                  );
+                }),
+            FutureBuilder<WebViewController>(
+                future: _controller.future,
+                builder: (BuildContext context,
+                    AsyncSnapshot<WebViewController> controller) {
+                  return IconButton(
+                    disabledColor: Colors.grey,
+                    icon: Icon(Icons.chevron_right),
+                    onPressed: _canGoForward ? controller.data.goForward : null,
+                  );
+                }),
             IconButton(
-              icon: Icon(Icons.chevron_left),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.chevron_right),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.bookmark_border),
-              onPressed: () {},
+              icon: Icon(_isCurrentUrlInBookmarks
+                  ? Icons.bookmark
+                  : Icons.bookmark_border),
+              onPressed: () {
+                _isCurrentUrlInBookmarks
+                    ? _removeCurrentUrlFromBookmarks()
+                    : _addCurrentUrlToBookmarks();
+              },
             ),
             IconButton(
               icon: Icon(Icons.list),
-              onPressed: () {},
+              onPressed: _viewBookmarks,
             ),
           ],
         ),
