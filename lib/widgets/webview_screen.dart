@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
 import '../classes/constants.dart';
+import 'navigation_drawer.dart';
 
 class WebViewScreen extends StatefulWidget {
   @override
@@ -108,6 +109,7 @@ class _WebViewScreenState extends State<WebViewScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // removes default drawer icon
         title: TextField(
             style: TextStyle(fontSize: 14),
             autofocus: false,
@@ -212,6 +214,7 @@ class _WebViewScreenState extends State<WebViewScreen>
           ],
         ),
       ),
+      drawer: NavigationDrawer(),
     );
   }
 }
