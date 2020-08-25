@@ -81,13 +81,27 @@ class _WebViewScreenState extends State<WebViewScreen>
 
         return Scaffold(
             appBar: AppBar(
-              title: Text(Constants.SETTINGS_BOOKMARKS),
+              title: Text(Constants.OPTION_BOOKMARKS),
             ),
             body: ListView(
               children: divided,
             ));
       },
     ));
+  }
+
+  void _triggerOption(String option) {
+    switch (option) {
+      case Constants.OPTION_REFRESH:
+        _controller.future
+            .then((WebViewController controller) => controller.reload());
+        break;
+      case Constants.OPTION_BOOKMARKS:
+        _viewBookmarks();
+        break;
+      default:
+        throw ("The option '$option' has not been implemented.");
+    }
   }
 
   @override
@@ -125,12 +139,12 @@ class _WebViewScreenState extends State<WebViewScreen>
           ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
-            onSelected: (String s) => print(s),
+            onSelected: _triggerOption,
             itemBuilder: (BuildContext context) {
-              return Constants.SETTINGS.keys.map((key) {
+              return Constants.OPTIONS.keys.map((key) {
                 return PopupMenuItem(
-                  child: Text(Constants.SETTINGS[key]),
-                  value: Constants.SETTINGS[key],
+                  child: Text(Constants.OPTIONS[key]),
+                  value: Constants.OPTIONS[key],
                 );
               }).toList();
             },
