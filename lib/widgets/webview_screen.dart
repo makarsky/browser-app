@@ -20,7 +20,9 @@ class _WebViewScreenState extends State<WebViewScreen>
   bool _isLoading = true;
   String _currentUrl =
       'https://medium.com/nonstopio/tagged/mobile-app-development';
+  String _cachedUrl;
   bool _isCurrentUrlInBookmarks = false;
+  bool _isCurrentUrlDirty = false;
   bool _canGoBack = false;
   bool _canGoForward = false;
 
@@ -29,13 +31,16 @@ class _WebViewScreenState extends State<WebViewScreen>
     super.initState();
 
     _textEditingController.value = TextEditingValue(text: _currentUrl);
+    _cachedUrl = _currentUrl;
   }
 
   void onPageStarted(String url) {
     setState(() {
       _isLoading = true;
-      _currentUrl = url;
-      _isCurrentUrlInBookmarks = _bookmarks.contains(_currentUrl);
+      _cachedUrl = _currentUrl = url;
+      _isCurrentUrlDirty = false;
+      _isCurrentUrlInBookmarks = _bookmarks.contains(_cachedUrl);
+      _textEditingController.value = TextEditingValue(text: _currentUrl);
     });
     setState(() async {
       _canGoBack = await _controller.future
@@ -53,14 +58,14 @@ class _WebViewScreenState extends State<WebViewScreen>
 
   void _addCurrentUrlToBookmarks() {
     setState(() {
-      _bookmarks.add(_currentUrl);
+      _bookmarks.add(_cachedUrl);
       _isCurrentUrlInBookmarks = true;
     });
   }
 
   void _removeCurrentUrlFromBookmarks() {
     setState(() {
-      _bookmarks.remove(_currentUrl);
+      _bookmarks.remove(_cachedUrl);
       _isCurrentUrlInBookmarks = false;
     });
   }
@@ -96,12 +101,26 @@ class _WebViewScreenState extends State<WebViewScreen>
       case Constants.OPTION_REFRESH:
         _controller.future
             .then((WebViewController controller) => controller.reload());
+        setState(() {
+          _currentUrl = _cachedUrl;
+          _textEditingController.value = TextEditingValue(text: _currentUrl);
+        });
         break;
       case Constants.OPTION_BOOKMARKS:
         _viewBookmarks();
         break;
       default:
         throw ("The option '$option' has not been implemented.");
+    }
+  }
+
+  void _updateWebView([String url]) {
+    if (_isCurrentUrlDirty) {
+      _controller.future.then(
+          (WebViewController controller) => controller.loadUrl(_currentUrl));
+    } else {
+      _controller.future
+          .then((WebViewController controller) => controller.reload());
     }
   }
 
@@ -116,6 +135,13 @@ class _WebViewScreenState extends State<WebViewScreen>
             keyboardType: TextInputType.url,
             maxLines: 1,
             controller: _textEditingController,
+            onChanged: (String newUrl) {
+              setState(() {
+                _currentUrl = newUrl;
+                _isCurrentUrlDirty = _currentUrl != _cachedUrl;
+              });
+            },
+            onSubmitted: _updateWebView,
             decoration: new InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
@@ -136,8 +162,8 @@ class _WebViewScreenState extends State<WebViewScreen>
                     top: 10.0, bottom: 10.0, left: 12.0, right: 12.0))),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.forward),
-            onPressed: () {},
+            icon: Icon(_isCurrentUrlDirty ? Icons.forward : Icons.refresh),
+            onPressed: _updateWebView,
           ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
@@ -155,7 +181,7 @@ class _WebViewScreenState extends State<WebViewScreen>
       ),
       body: Stack(children: <Widget>[
         WebView(
-          initialUrl: _currentUrl,
+          initialUrl: _cachedUrl,
           onWebViewCreated: (WebViewController webViewController) {
             _controller.complete(webViewController);
           },
