@@ -3,7 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
 import '../classes/constants.dart';
-import 'navigation_drawer.dart';
+import '../widgets/navigation_drawer.dart';
 
 class WebViewScreen extends StatefulWidget {
   @override
@@ -201,7 +201,7 @@ class _WebViewScreenState extends State<WebViewScreen>
       bottomNavigationBar: BottomAppBar(
         child: new Row(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             FutureBuilder<WebViewController>(
                 future: _controller.future,
