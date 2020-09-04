@@ -82,16 +82,21 @@ class _WebViewScreenState extends State<WebViewScreen>
           );
         });
 
-        final List<Widget> divided =
+        final List<Widget> dividedTiles =
             ListTile.divideTiles(context: context, tiles: tiles).toList();
+
+        final Center emptyContainer =
+            Center(child: Text('You haven\'t added anything yet...'));
+
+        Widget listView = ListView(
+          children: dividedTiles,
+        );
 
         return Scaffold(
             appBar: AppBar(
               title: Text(Constants.OPTION_BOOKMARKS),
             ),
-            body: ListView(
-              children: divided,
-            ));
+            body: _bookmarks.isEmpty ? emptyContainer : listView);
       },
     ));
   }
