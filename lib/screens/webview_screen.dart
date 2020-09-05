@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/animation.dart';
 import '../classes/constants.dart';
 import '../widgets/navigation_drawer.dart';
+import 'package:validators/validators.dart';
 
 class WebViewScreen extends StatefulWidget {
   @override
@@ -117,23 +118,38 @@ class _WebViewScreenState extends State<WebViewScreen>
       default:
         throw ("The option '$option' has not been implemented.");
     }
+
+    FocusManager.instance.primaryFocus.unfocus();
   }
 
   void _updateWebView([String url]) {
+    bool isValidURL = false;
+    try {
+      isValidURL = isURL(_currentUrl, requireTld: true, requireProtocol: true);
+    } catch (e) {}
+
     if (_isCurrentUrlDirty) {
-      _controller.future.then(
-          (WebViewController controller) => controller.loadUrl(_currentUrl));
+      if (isValidURL) {
+        _controller.future.then(
+            (WebViewController controller) => controller.loadUrl(_currentUrl));
+      } else {
+        String encodedString = Uri.encodeFull(_currentUrl);
+        _controller.future.then((WebViewController controller) => controller
+            .loadUrl('https://www.google.com/search?q=$encodedString'));
+      }
     } else {
       _controller.future
           .then((WebViewController controller) => controller.reload());
     }
+
+    FocusManager.instance.primaryFocus.unfocus();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // removes default drawer icon
+        automaticallyImplyLeading: false, // Removes the default drawer icon
         title: TextField(
             style: TextStyle(fontSize: 14),
             autofocus: false,
@@ -142,7 +158,7 @@ class _WebViewScreenState extends State<WebViewScreen>
             controller: _textEditingController,
             onChanged: (String newUrl) {
               setState(() {
-                _currentUrl = newUrl;
+                _currentUrl = newUrl.trim();
                 _isCurrentUrlDirty = _currentUrl != _cachedUrl;
               });
             },
