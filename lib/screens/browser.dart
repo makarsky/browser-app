@@ -1,3 +1,4 @@
+import 'package:demo/screens/bookmarks.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
@@ -6,12 +7,12 @@ import '../classes/constants.dart';
 import '../widgets/navigation_drawer.dart';
 import 'package:validators/validators.dart';
 
-class WebViewScreen extends StatefulWidget {
+class BrowserScreen extends StatefulWidget {
   @override
-  _WebViewScreenState createState() => _WebViewScreenState();
+  _BrowserScreenState createState() => _BrowserScreenState();
 }
 
-class _WebViewScreenState extends State<WebViewScreen>
+class _BrowserScreenState extends State<BrowserScreen>
     with TickerProviderStateMixin {
   Completer<WebViewController> _controller = Completer<WebViewController>();
   final _formKey = GlobalKey<FormState>();
@@ -73,32 +74,7 @@ class _WebViewScreenState extends State<WebViewScreen>
 
   void _viewBookmarks() {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (BuildContext context) {
-        final Iterable<ListTile> tiles = _bookmarks.map((String url) {
-          return ListTile(
-            title: Text(
-              url,
-              style: TextStyle(fontSize: 16.0),
-            ),
-          );
-        });
-
-        final List<Widget> dividedTiles =
-            ListTile.divideTiles(context: context, tiles: tiles).toList();
-
-        final Center emptyContainer =
-            Center(child: Text('You haven\'t added anything yet...'));
-
-        Widget listView = ListView(
-          children: dividedTiles,
-        );
-
-        return Scaffold(
-            appBar: AppBar(
-              title: Text(Constants.OPTION_BOOKMARKS),
-            ),
-            body: _bookmarks.isEmpty ? emptyContainer : listView);
-      },
+      builder: (BuildContext context) => BookmarksScreen(bookmarks: _bookmarks),
     ));
   }
 

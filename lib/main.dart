@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './screens/webview_screen.dart';
+import './screens/browser.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
         }),
       ),
-      home: WebViewScreen(),
+      home: BrowserScreen(),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
-import './screens/webview_screen.dart';
+import './screens/browser.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
 
   _HomePageState() {
     _children.add(
-      WebViewScreen(),
+      BrowserScreen(),
     );
     _children.add(buildList());
   }
