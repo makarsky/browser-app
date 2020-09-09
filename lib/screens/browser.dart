@@ -15,8 +15,8 @@ class BrowserScreen extends StatefulWidget {
 class _BrowserScreenState extends State<BrowserScreen>
     with TickerProviderStateMixin {
   Completer<WebViewController> _controller = Completer<WebViewController>();
-  final _formKey = GlobalKey<FormState>();
   TextEditingController _textEditingController = TextEditingController();
+  AnimationController _rotationController;
 
   final Set<String> _bookmarks = Set<String>();
   bool _isLoading = true;
@@ -34,6 +34,8 @@ class _BrowserScreenState extends State<BrowserScreen>
 
     _textEditingController.value = TextEditingValue(text: _currentUrl);
     _cachedUrl = _currentUrl;
+    _rotationController = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
   }
 
   void onPageStarted(String url) {
@@ -43,6 +45,7 @@ class _BrowserScreenState extends State<BrowserScreen>
       _isCurrentUrlDirty = false;
       _isCurrentUrlInBookmarks = _bookmarks.contains(_cachedUrl);
       _textEditingController.value = TextEditingValue(text: _currentUrl);
+      _rotationController.reset();
     });
     setState(() async {
       _canGoBack = await _controller.future
@@ -81,6 +84,7 @@ class _BrowserScreenState extends State<BrowserScreen>
   void _triggerOption(String option) {
     switch (option) {
       case Constants.OPTION_REFRESH:
+        _rotationController.repeat();
         _controller.future
             .then((WebViewController controller) => controller.reload());
         setState(() {
@@ -114,6 +118,7 @@ class _BrowserScreenState extends State<BrowserScreen>
             .loadUrl('https://www.google.com/search?q=$encodedString'));
       }
     } else {
+      _rotationController.repeat();
       _controller.future
           .then((WebViewController controller) => controller.reload());
     }
@@ -158,10 +163,12 @@ class _BrowserScreenState extends State<BrowserScreen>
                 contentPadding: const EdgeInsets.only(
                     top: 10.0, bottom: 10.0, left: 12.0, right: 12.0))),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(_isCurrentUrlDirty ? Icons.forward : Icons.refresh),
-            onPressed: _updateWebView,
-          ),
+          RotationTransition(
+              turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
+              child: IconButton(
+                icon: Icon(_isCurrentUrlDirty ? Icons.forward : Icons.refresh),
+                onPressed: _updateWebView,
+              )),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             onSelected: _triggerOption,
