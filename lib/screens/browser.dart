@@ -16,10 +16,10 @@ class _BrowserScreenState extends State<BrowserScreen>
     with TickerProviderStateMixin {
   Completer<WebViewController> _controller = Completer<WebViewController>();
   TextEditingController _textEditingController = TextEditingController();
-  AnimationController _rotationController;
+  AnimationController _refreshIconRotationController;
 
   final Set<String> _bookmarks = Set<String>();
-  bool _isLoading = true;
+  double _linearLoaderHeight = 0.0;
   String _currentUrl =
       'https://medium.com/nonstopio/tagged/mobile-app-development';
   String _cachedUrl;
@@ -34,18 +34,18 @@ class _BrowserScreenState extends State<BrowserScreen>
 
     _textEditingController.value = TextEditingValue(text: _currentUrl);
     _cachedUrl = _currentUrl;
-    _rotationController = AnimationController(
+    _refreshIconRotationController = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
   }
 
   void onPageStarted(String url) {
     setState(() {
-      _isLoading = true;
+      _linearLoaderHeight = 4.0;
       _cachedUrl = _currentUrl = url;
       _isCurrentUrlDirty = false;
       _isCurrentUrlInBookmarks = _bookmarks.contains(_cachedUrl);
       _textEditingController.value = TextEditingValue(text: _currentUrl);
-      _rotationController.reset();
+      _refreshIconRotationController.reset();
     });
     setState(() async {
       _canGoBack = await _controller.future
@@ -57,7 +57,7 @@ class _BrowserScreenState extends State<BrowserScreen>
 
   void onPageFinished(String url) {
     setState(() {
-      _isLoading = false;
+      _linearLoaderHeight = 0.0;
     });
   }
 
@@ -84,7 +84,7 @@ class _BrowserScreenState extends State<BrowserScreen>
   void _triggerOption(String option) {
     switch (option) {
       case Constants.OPTION_REFRESH:
-        _rotationController.repeat();
+        _refreshIconRotationController.repeat();
         _controller.future
             .then((WebViewController controller) => controller.reload());
         setState(() {
@@ -118,7 +118,7 @@ class _BrowserScreenState extends State<BrowserScreen>
             .loadUrl('https://www.google.com/search?q=$encodedString'));
       }
     } else {
-      _rotationController.repeat();
+      _refreshIconRotationController.repeat();
       _controller.future
           .then((WebViewController controller) => controller.reload());
     }
@@ -164,7 +164,8 @@ class _BrowserScreenState extends State<BrowserScreen>
                     top: 10.0, bottom: 10.0, left: 12.0, right: 12.0))),
         actions: <Widget>[
           RotationTransition(
-              turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
+              turns: Tween(begin: 0.0, end: 1.0)
+                  .animate(_refreshIconRotationController),
               child: IconButton(
                 icon: Icon(_isCurrentUrlDirty ? Icons.forward : Icons.refresh),
                 onPressed: _updateWebView,
@@ -193,10 +194,12 @@ class _BrowserScreenState extends State<BrowserScreen>
           onPageFinished: onPageFinished,
           javascriptMode: JavascriptMode.unrestricted,
         ),
-        Visibility(
-            visible: _isLoading,
-            child: Align(
-                alignment: Alignment.topCenter,
+        Align(
+            alignment: Alignment.topCenter,
+            child: AnimatedContainer(
+                curve: Curves.easeInOut,
+                height: _linearLoaderHeight,
+                duration: new Duration(milliseconds: 400),
                 child: LinearProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   backgroundColor: Colors.blue,
