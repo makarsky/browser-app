@@ -137,6 +137,9 @@ class _BrowserScreenState extends State<BrowserScreen>
             keyboardType: TextInputType.url,
             maxLines: 1,
             controller: _textEditingController,
+            onTap: () => _textEditingController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: _textEditingController.text.length),
             onChanged: (String newUrl) {
               setState(() {
                 _currentUrl = newUrl.trim();
@@ -161,7 +164,7 @@ class _BrowserScreenState extends State<BrowserScreen>
                 ),
                 isDense: true,
                 contentPadding: const EdgeInsets.only(
-                    top: 10.0, bottom: 10.0, left: 12.0, right: 12.0))),
+                    top: 10.0, bottom: 10.0, left: 15.0, right: 15.0))),
         actions: <Widget>[
           RotationTransition(
               turns: Tween(begin: 0.0, end: 1.0)
@@ -199,7 +202,7 @@ class _BrowserScreenState extends State<BrowserScreen>
             child: AnimatedContainer(
                 curve: Curves.easeInOut,
                 height: _linearLoaderHeight,
-                duration: new Duration(milliseconds: 400),
+                duration: new Duration(milliseconds: 200),
                 child: LinearProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   backgroundColor: Colors.blue,
