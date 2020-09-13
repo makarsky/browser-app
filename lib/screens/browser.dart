@@ -6,6 +6,7 @@ import 'package:flutter/animation.dart';
 import '../classes/constants.dart';
 import '../widgets/navigation_drawer.dart';
 import 'package:validators/validators.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BrowserScreen extends StatefulWidget {
   @override
@@ -14,12 +15,13 @@ class BrowserScreen extends StatefulWidget {
 
 class _BrowserScreenState extends State<BrowserScreen>
     with TickerProviderStateMixin {
+  SharedPreferences sharedPreferences;
   Completer<WebViewController> _controller = Completer<WebViewController>();
   TextEditingController _textEditingController = TextEditingController();
   AnimationController _refreshIconRotationController;
 
   final Set<String> _bookmarks = Set<String>();
-  double _linearLoaderHeight = 0.0;
+  double _linearLoaderHeight = 4.0;
   String _currentUrl =
       'https://medium.com/nonstopio/tagged/mobile-app-development';
   String _cachedUrl;
@@ -32,10 +34,34 @@ class _BrowserScreenState extends State<BrowserScreen>
   void initState() {
     super.initState();
 
-    _textEditingController.value = TextEditingValue(text: _currentUrl);
-    _cachedUrl = _currentUrl;
     _refreshIconRotationController = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
+    initSharedPreferencesAndCurrentUrl();
+  }
+
+  void initSharedPreferencesAndCurrentUrl() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      _currentUrl =
+          _cachedUrl = sharedPreferences.getString('lastUrl') ?? _currentUrl;
+      _textEditingController.value = TextEditingValue(text: _cachedUrl);
+      _linearLoaderHeight = 0.0;
+    });
+  }
+
+  Widget _getBody() {
+    if (sharedPreferences != null) {
+      return WebView(
+        initialUrl: _cachedUrl,
+        onWebViewCreated: (WebViewController webViewController) {
+          _controller.complete(webViewController);
+        },
+        onPageStarted: onPageStarted,
+        onPageFinished: onPageFinished,
+        javascriptMode: JavascriptMode.unrestricted,
+      );
+    }
+    return Container();
   }
 
   void onPageStarted(String url) {
@@ -46,6 +72,7 @@ class _BrowserScreenState extends State<BrowserScreen>
       _isCurrentUrlInBookmarks = _bookmarks.contains(_cachedUrl);
       _textEditingController.value = TextEditingValue(text: _currentUrl);
       _refreshIconRotationController.reset();
+      sharedPreferences.setString('lastUrl', _cachedUrl);
     });
     setState(() async {
       _canGoBack = await _controller.future
@@ -188,15 +215,7 @@ class _BrowserScreenState extends State<BrowserScreen>
         ],
       ),
       body: Stack(children: <Widget>[
-        WebView(
-          initialUrl: _cachedUrl,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-          },
-          onPageStarted: onPageStarted,
-          onPageFinished: onPageFinished,
-          javascriptMode: JavascriptMode.unrestricted,
-        ),
+        _getBody(),
         Align(
             alignment: Alignment.topCenter,
             child: AnimatedContainer(
