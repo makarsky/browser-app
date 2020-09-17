@@ -32,6 +32,7 @@ dependencies:
   validators: ^2.0.0
   shared_preferences: ^0.5.10
   flutter_launcher_icons: ^0.8.0
+  rate_my_app: ^0.7.2
 
 dev_dependencies:
   flutter_test:
