@@ -9,6 +9,7 @@ class NavigationDrawer extends StatefulWidget {
 
 class _NavigationDrawerState extends State<NavigationDrawer> {
   WidgetBuilder builder = buildProgressIndicator;
+  TextEditingController feedbackController = TextEditingController();
 
   static Widget buildProgressIndicator(BuildContext context) => const Center();
 
@@ -63,6 +64,28 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     );
   }
 
+  Future<String> _openFeedbackDialod(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Share your thought and questions with us'),
+            content: TextField(
+              controller: feedbackController,
+            ),
+            actions: <Widget>[
+              MaterialButton(
+                child: Text('Submit'),
+                onPressed: () {
+                  Navigator.pop(
+                      context, feedbackController.text.trim().toString());
+                },
+              )
+            ],
+          );
+        });
+  }
+
   Widget _getDrawer(RateMyApp rateMyApp) {
     return Drawer(
       child: ListView(
@@ -85,7 +108,12 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ListTile(
             leading: Icon(Icons.border_color),
             title: Text('Feedback'),
-            onTap: () => {Navigator.of(context).pop()},
+            onTap: () => _openFeedbackDialod(context).then((value) {
+              print(value);
+              Scaffold.of(context).showSnackBar(
+                  SnackBar(content: Text('Thank you for your feedback!')));
+              // Navigator.of(context).pop();
+            }),
           ),
         ],
       ),
@@ -100,8 +128,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
         setState(() => builder = (context) => _getDrawer(rateMyApp));
         rateMyApp.conditions.forEach((condition) {
           if (condition is DebuggableCondition) {
-            print(condition
-                .valuesAsString); // We iterate through our list of conditions and we print all debuggable ones.
+            print(condition.valuesAsString);
           }
         });
 
