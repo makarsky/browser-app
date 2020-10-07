@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:rate_my_app/rate_my_app.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NavigationDrawer extends StatefulWidget {
   @override
@@ -9,9 +11,13 @@ class NavigationDrawer extends StatefulWidget {
 
 class _NavigationDrawerState extends State<NavigationDrawer> {
   WidgetBuilder builder = buildProgressIndicator;
-  TextEditingController feedbackController = TextEditingController();
 
   static Widget buildProgressIndicator(BuildContext context) => const Center();
+
+  final Uri _emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'support@browserbookmarks.com',
+      queryParameters: {'subject': 'Issue Report'});
 
   void _rateMyAppHandler(RateMyApp rateMyApp) {
     Navigator.of(context).pop();
@@ -64,28 +70,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     );
   }
 
-  Future<String> _openFeedbackDialod(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Share your thought and questions with us'),
-            content: TextField(
-              controller: feedbackController,
-            ),
-            actions: <Widget>[
-              MaterialButton(
-                child: Text('Submit'),
-                onPressed: () {
-                  Navigator.pop(
-                      context, feedbackController.text.trim().toString());
-                },
-              )
-            ],
-          );
-        });
-  }
-
   Widget _getDrawer(RateMyApp rateMyApp) {
     return Drawer(
       child: ListView(
@@ -108,12 +92,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ListTile(
             leading: Icon(Icons.border_color),
             title: Text('Feedback'),
-            onTap: () => _openFeedbackDialod(context).then((value) {
-              print(value);
-              Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text('Thank you for your feedback!')));
-              // Navigator.of(context).pop();
-            }),
+            onTap: () => {launch(_emailLaunchUri.toString())},
           ),
         ],
       ),
