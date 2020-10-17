@@ -1,10 +1,11 @@
+import 'package:browserbookmarks/models/bookmark.dart';
 import 'package:flutter/material.dart';
 import '../classes/constants.dart';
 
 class BookmarksScreen extends StatefulWidget {
   BookmarksScreen({Key key, this.bookmarks}) : super(key: key);
 
-  final Set<String> bookmarks;
+  final Set<Bookmark> bookmarks;
 
   @override
   _BookmarksScreenState createState() => _BookmarksScreenState();
@@ -13,11 +14,15 @@ class BookmarksScreen extends StatefulWidget {
 class _BookmarksScreenState extends State<BookmarksScreen> {
   @override
   Widget build(BuildContext context) {
-    final Iterable<ListTile> tiles = widget.bookmarks.map((String url) {
+    final Iterable<ListTile> tiles = widget.bookmarks.map((Bookmark bookmark) {
       return ListTile(
         title: Text(
-          url,
+          bookmark.title,
           style: TextStyle(fontSize: 16.0),
+        ),
+        subtitle: Text(
+          bookmark.url,
+          style: TextStyle(fontSize: 14.0),
         ),
       );
     });

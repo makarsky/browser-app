@@ -1,3 +1,4 @@
+import 'package:browserbookmarks/models/bookmark.dart';
 import 'package:browserbookmarks/screens/bookmarks.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -20,7 +21,7 @@ class _BrowserScreenState extends State<BrowserScreen>
   TextEditingController _textEditingController = TextEditingController();
   AnimationController _refreshIconRotationController;
 
-  final Set<String> _bookmarks = Set<String>();
+  final Set<Bookmark> _bookmarks = Set<Bookmark>();
   double _linearLoaderHeight = 4.0;
   String _currentUrl =
       'https://medium.com/nonstopio/tagged/mobile-app-development';
@@ -69,7 +70,8 @@ class _BrowserScreenState extends State<BrowserScreen>
       _linearLoaderHeight = 4.0;
       _cachedUrl = _currentUrl = url;
       _isCurrentUrlDirty = false;
-      _isCurrentUrlInBookmarks = _bookmarks.contains(_cachedUrl);
+      _isCurrentUrlInBookmarks =
+          _bookmarks.any((Bookmark bookmark) => bookmark.url == _cachedUrl);
       _textEditingController.value = TextEditingValue(text: _currentUrl);
       _refreshIconRotationController.reset();
       sharedPreferences.setString('lastUrl', _cachedUrl);
@@ -90,14 +92,18 @@ class _BrowserScreenState extends State<BrowserScreen>
 
   void _addCurrentUrlToBookmarks() {
     setState(() {
-      _bookmarks.add(_cachedUrl);
-      _isCurrentUrlInBookmarks = true;
+      _controller.future
+          .then((WebViewController controller) => controller.getTitle())
+          .then((String title) {
+        _bookmarks.add(new Bookmark(title, _cachedUrl));
+        _isCurrentUrlInBookmarks = true;
+      });
     });
   }
 
   void _removeCurrentUrlFromBookmarks() {
     setState(() {
-      _bookmarks.remove(_cachedUrl);
+      _bookmarks.removeWhere((Bookmark bookmark) => bookmark.url == _cachedUrl);
       _isCurrentUrlInBookmarks = false;
     });
   }
