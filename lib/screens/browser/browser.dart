@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
-import '../classes/constants.dart';
-import '../widgets/navigation_drawer.dart';
+import '../../classes/constants.dart';
+import './local_widgets/navigation_drawer.dart';
 import 'package:validators/validators.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
