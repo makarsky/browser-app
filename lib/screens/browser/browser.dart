@@ -108,10 +108,18 @@ class _BrowserScreenState extends State<BrowserScreen>
     });
   }
 
-  void _viewBookmarks() {
-    Navigator.of(context).push(MaterialPageRoute(
+  void _viewBookmarks() async {
+    final result = await Navigator.of(context).push(MaterialPageRoute(
       builder: (BuildContext context) => BookmarksScreen(bookmarks: _bookmarks),
     ));
+
+    if (result is String) {
+      setState(() {
+        _linearLoaderHeight = 4.0;
+        _controller.future
+            .then((WebViewController controller) => controller.loadUrl(result));
+      });
+    }
   }
 
   void _triggerOption(String option) {

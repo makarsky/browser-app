@@ -24,6 +24,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
           bookmark.url,
           style: TextStyle(fontSize: 14.0),
         ),
+        onTap: () => Navigator.pop(context, bookmark.url),
       );
     });
 
