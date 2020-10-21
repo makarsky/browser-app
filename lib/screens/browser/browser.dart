@@ -95,7 +95,7 @@ class _BrowserScreenState extends State<BrowserScreen>
       _controller.future
           .then((WebViewController controller) => controller.getTitle())
           .then((String title) {
-        _bookmarks.add(new Bookmark(title, _cachedUrl));
+        _bookmarks.add(Bookmark(title, _cachedUrl));
         _isCurrentUrlInBookmarks = true;
       });
     });
@@ -178,17 +178,17 @@ class _BrowserScreenState extends State<BrowserScreen>
 
     return showDialog(
           context: context,
-          builder: (context) => new AlertDialog(
-            title: new Text('Confirm'),
-            content: new Text('Do you want to exit?'),
+          builder: (context) => AlertDialog(
+            title: Text('Confirm'),
+            content: Text('Do you want to exit?'),
             actions: <Widget>[
-              new GestureDetector(
-                onTap: () => Navigator.of(context).pop(false),
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
                 child: Text('No'),
               ),
               SizedBox(height: 16),
-              new GestureDetector(
-                onTap: () => Navigator.of(context).pop(true),
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(true),
                 child: Text('Yes'),
               ),
             ],
@@ -220,7 +220,7 @@ class _BrowserScreenState extends State<BrowserScreen>
                   });
                 },
                 onSubmitted: _updateWebView,
-                decoration: new InputDecoration(
+                decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
                     enabledBorder: OutlineInputBorder(
@@ -268,14 +268,14 @@ class _BrowserScreenState extends State<BrowserScreen>
                 child: AnimatedContainer(
                     curve: Curves.easeInOut,
                     height: _linearLoaderHeight,
-                    duration: new Duration(milliseconds: 200),
+                    duration: Duration(milliseconds: 200),
                     child: LinearProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       backgroundColor: Colors.blue,
                     ))),
           ]),
           bottomNavigationBar: BottomAppBar(
-            child: new Row(
+            child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
