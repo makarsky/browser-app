@@ -167,123 +167,157 @@ class _BrowserScreenState extends State<BrowserScreen>
     FocusManager.instance.primaryFocus.unfocus();
   }
 
+  Future<bool> _onBackPressed() async {
+    WebViewController webViewController = await _controller.future;
+    _canGoBack = await webViewController.canGoBack();
+
+    if (_canGoBack) {
+      webViewController.goBack();
+      return false;
+    }
+
+    return showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: new Text('Confirm'),
+            content: new Text('Do you want to exit?'),
+            actions: <Widget>[
+              new GestureDetector(
+                onTap: () => Navigator.of(context).pop(false),
+                child: Text('No'),
+              ),
+              SizedBox(height: 16),
+              new GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes the default drawer icon
-        title: TextField(
-            style: TextStyle(fontSize: 14),
-            autofocus: false,
-            keyboardType: TextInputType.url,
-            maxLines: 1,
-            controller: _textEditingController,
-            onTap: () => _textEditingController.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: _textEditingController.text.length),
-            onChanged: (String newUrl) {
-              setState(() {
-                _currentUrl = newUrl.trim();
-                _isCurrentUrlDirty = _currentUrl != _cachedUrl;
-              });
-            },
-            onSubmitted: _updateWebView,
-            decoration: new InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(50.0),
-                  ),
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(50.0),
-                  ),
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                isDense: true,
-                contentPadding: const EdgeInsets.only(
-                    top: 10.0, bottom: 10.0, left: 15.0, right: 15.0))),
-        actions: <Widget>[
-          RotationTransition(
-              turns: Tween(begin: 0.0, end: 1.0)
-                  .animate(_refreshIconRotationController),
-              child: IconButton(
-                icon: Icon(_isCurrentUrlDirty ? Icons.forward : Icons.refresh),
-                onPressed: _updateWebView,
-              )),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert),
-            onSelected: _triggerOption,
-            itemBuilder: (BuildContext context) {
-              return Constants.OPTIONS.keys.map((key) {
-                return PopupMenuItem(
-                  child: Text(Constants.OPTIONS[key]),
-                  value: Constants.OPTIONS[key],
-                );
-              }).toList();
-            },
+    return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false, // Removes the default drawer icon
+            title: TextField(
+                style: TextStyle(fontSize: 14),
+                autofocus: false,
+                keyboardType: TextInputType.url,
+                maxLines: 1,
+                controller: _textEditingController,
+                onTap: () => _textEditingController.selection = TextSelection(
+                    baseOffset: 0,
+                    extentOffset: _textEditingController.text.length),
+                onChanged: (String newUrl) {
+                  setState(() {
+                    _currentUrl = newUrl.trim();
+                    _isCurrentUrlDirty = _currentUrl != _cachedUrl;
+                  });
+                },
+                onSubmitted: _updateWebView,
+                decoration: new InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(50.0),
+                      ),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(50.0),
+                      ),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.only(
+                        top: 10.0, bottom: 10.0, left: 15.0, right: 15.0))),
+            actions: <Widget>[
+              RotationTransition(
+                  turns: Tween(begin: 0.0, end: 1.0)
+                      .animate(_refreshIconRotationController),
+                  child: IconButton(
+                    icon: Icon(
+                        _isCurrentUrlDirty ? Icons.forward : Icons.refresh),
+                    onPressed: _updateWebView,
+                  )),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert),
+                onSelected: _triggerOption,
+                itemBuilder: (BuildContext context) {
+                  return Constants.OPTIONS.keys.map((key) {
+                    return PopupMenuItem(
+                      child: Text(Constants.OPTIONS[key]),
+                      value: Constants.OPTIONS[key],
+                    );
+                  }).toList();
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Stack(children: <Widget>[
-        _getBody(),
-        Align(
-            alignment: Alignment.topCenter,
-            child: AnimatedContainer(
-                curve: Curves.easeInOut,
-                height: _linearLoaderHeight,
-                duration: new Duration(milliseconds: 200),
-                child: LinearProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  backgroundColor: Colors.blue,
-                ))),
-      ]),
-      bottomNavigationBar: BottomAppBar(
-        child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            FutureBuilder<WebViewController>(
-                future: _controller.future,
-                builder: (BuildContext context,
-                    AsyncSnapshot<WebViewController> controller) {
-                  return IconButton(
-                    disabledColor: Colors.grey,
-                    icon: Icon(Icons.chevron_left),
-                    onPressed: _canGoBack ? controller.data.goBack : null,
-                  );
-                }),
-            FutureBuilder<WebViewController>(
-                future: _controller.future,
-                builder: (BuildContext context,
-                    AsyncSnapshot<WebViewController> controller) {
-                  return IconButton(
-                    disabledColor: Colors.grey,
-                    icon: Icon(Icons.chevron_right),
-                    onPressed: _canGoForward ? controller.data.goForward : null,
-                  );
-                }),
-            IconButton(
-              icon: Icon(_isCurrentUrlInBookmarks
-                  ? Icons.bookmark
-                  : Icons.bookmark_border),
-              onPressed: () {
-                _isCurrentUrlInBookmarks
-                    ? _removeCurrentUrlFromBookmarks()
-                    : _addCurrentUrlToBookmarks();
-              },
+          body: Stack(children: <Widget>[
+            _getBody(),
+            Align(
+                alignment: Alignment.topCenter,
+                child: AnimatedContainer(
+                    curve: Curves.easeInOut,
+                    height: _linearLoaderHeight,
+                    duration: new Duration(milliseconds: 200),
+                    child: LinearProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      backgroundColor: Colors.blue,
+                    ))),
+          ]),
+          bottomNavigationBar: BottomAppBar(
+            child: new Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                FutureBuilder<WebViewController>(
+                    future: _controller.future,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<WebViewController> controller) {
+                      return IconButton(
+                        disabledColor: Colors.grey,
+                        icon: Icon(Icons.chevron_left),
+                        onPressed: _canGoBack ? controller.data.goBack : null,
+                      );
+                    }),
+                FutureBuilder<WebViewController>(
+                    future: _controller.future,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<WebViewController> controller) {
+                      return IconButton(
+                        disabledColor: Colors.grey,
+                        icon: Icon(Icons.chevron_right),
+                        onPressed:
+                            _canGoForward ? controller.data.goForward : null,
+                      );
+                    }),
+                IconButton(
+                  icon: Icon(_isCurrentUrlInBookmarks
+                      ? Icons.bookmark
+                      : Icons.bookmark_border),
+                  onPressed: () {
+                    _isCurrentUrlInBookmarks
+                        ? _removeCurrentUrlFromBookmarks()
+                        : _addCurrentUrlToBookmarks();
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.list),
+                  onPressed: _viewBookmarks,
+                ),
+              ],
             ),
-            IconButton(
-              icon: Icon(Icons.list),
-              onPressed: _viewBookmarks,
-            ),
-          ],
-        ),
-      ),
-      drawer: NavigationDrawer(),
-    );
+          ),
+          drawer: NavigationDrawer(),
+        ));
   }
 }
