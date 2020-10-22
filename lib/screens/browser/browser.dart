@@ -1,5 +1,5 @@
-import 'package:browserbookmarks/models/bookmark.dart';
-import 'package:browserbookmarks/screens/bookmarks.dart';
+import 'package:browserapp/models/bookmark.dart';
+import 'package:browserapp/screens/bookmarks.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';

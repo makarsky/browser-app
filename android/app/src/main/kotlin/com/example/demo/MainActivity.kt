@@ -1,4 +1,4 @@
-package com.makarsky.browserbookmarks
+package com.makarsky.browserapp
 
 import io.flutter.embedding.android.FlutterActivity
 

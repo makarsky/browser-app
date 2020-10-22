@@ -16,7 +16,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'support@browserbookmarks.com',
+      path: 'support@browserapp.com',
       queryParameters: {'subject': 'Issue Report'});
 
   void _rateMyAppHandler(RateMyApp rateMyApp) {
@@ -77,7 +77,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
         children: <Widget>[
           DrawerHeader(
             child: Text(
-              'Browser and Bookmarks',
+              'Browser',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
             decoration: BoxDecoration(

@@ -1,4 +1,4 @@
-import 'package:browserbookmarks/models/bookmark.dart';
+import 'package:browserapp/models/bookmark.dart';
 import 'package:flutter/material.dart';
 import '../classes/constants.dart';
 
