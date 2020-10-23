@@ -38,10 +38,17 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
       children: dividedTiles,
     );
 
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(Constants.OPTION_BOOKMARKS),
-        ),
-        body: widget.bookmarks.isEmpty ? emptyContainer : listView);
+    return WillPopScope(
+        onWillPop: () async {
+          if (Navigator.of(context).userGestureInProgress)
+            return false;
+          else
+            return true;
+        },
+        child: Scaffold(
+            appBar: AppBar(
+              title: Text(Constants.OPTION_BOOKMARKS),
+            ),
+            body: widget.bookmarks.isEmpty ? emptyContainer : listView));
   }
 }
