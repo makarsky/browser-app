@@ -20,8 +20,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       queryParameters: {'subject': 'Issue Report'});
 
   void _rateMyAppHandler(RateMyApp rateMyApp) {
-    Navigator.of(context).pop();
-
     rateMyApp.showStarRateDialog(
       context,
       title: 'Rate us!',

@@ -1,11 +1,11 @@
 import 'package:browserapp/models/bookmark.dart';
 import 'package:flutter/material.dart';
-import '../classes/constants.dart';
+import '../../classes/constants.dart';
 
 class BookmarksScreen extends StatefulWidget {
   BookmarksScreen({Key key, this.bookmarks}) : super(key: key);
 
-  final Set<Bookmark> bookmarks;
+  final List<Bookmark> bookmarks;
 
   @override
   _BookmarksScreenState createState() => _BookmarksScreenState();

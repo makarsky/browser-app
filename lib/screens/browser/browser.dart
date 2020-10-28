@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:browserapp/models/bookmark.dart';
-import 'package:browserapp/screens/bookmarks.dart';
+import 'package:browserapp/screens/bookmarks/bookmarks.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
@@ -21,7 +22,7 @@ class _BrowserScreenState extends State<BrowserScreen>
   TextEditingController _textEditingController = TextEditingController();
   AnimationController _refreshIconRotationController;
 
-  final Set<Bookmark> _bookmarks = Set<Bookmark>();
+  List<Bookmark> _bookmarks = List<Bookmark>();
   double _linearLoaderHeight = 4.0;
   String _currentUrl =
       'https://medium.com/nonstopio/tagged/mobile-app-development';
@@ -47,6 +48,10 @@ class _BrowserScreenState extends State<BrowserScreen>
           _cachedUrl = sharedPreferences.getString('lastUrl') ?? _currentUrl;
       _textEditingController.value = TextEditingValue(text: _cachedUrl);
       _linearLoaderHeight = 0.0;
+      _bookmarks =
+          (jsonDecode(sharedPreferences.getString('bookmarks')) as List)
+              .map((data) => Bookmark.fromJson(data))
+              .toList();
     });
   }
 
@@ -90,12 +95,14 @@ class _BrowserScreenState extends State<BrowserScreen>
     });
   }
 
-  void _addCurrentUrlToBookmarks() {
+  void _addCurrentUrlToBookmarks() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       _controller.future
           .then((WebViewController controller) => controller.getTitle())
           .then((String title) {
-        _bookmarks.add(Bookmark(title, _cachedUrl));
+        _bookmarks.add(Bookmark(title: title, url: _cachedUrl));
+        sharedPreferences.setString('bookmarks', jsonEncode(_bookmarks));
         _isCurrentUrlInBookmarks = true;
       });
     });
