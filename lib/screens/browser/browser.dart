@@ -144,7 +144,7 @@ class _BrowserScreenState extends State<BrowserScreen>
         _viewBookmarks();
         break;
       default:
-        throw ("The option '$option' has not been implemented.");
+        throw ("The option '$option' is not implemented.");
     }
 
     FocusManager.instance.primaryFocus.unfocus();
