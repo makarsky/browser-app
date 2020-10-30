@@ -127,6 +127,11 @@ class _BrowserScreenState extends State<BrowserScreen>
             .then((WebViewController controller) => controller.loadUrl(result));
       });
     }
+
+    setState(() {
+      _isCurrentUrlInBookmarks =
+          _bookmarks.any((Bookmark bookmark) => bookmark.url == _cachedUrl);
+    });
   }
 
   void _triggerOption(String option) {
