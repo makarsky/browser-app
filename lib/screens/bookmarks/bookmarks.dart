@@ -14,41 +14,8 @@ class BookmarksScreen extends StatefulWidget {
 }
 
 class _BookmarksScreenState extends State<BookmarksScreen> {
-  void _triggerOption(Bookmark bookmark, String option) async {
-    switch (option) {
-      case 'delete':
-        SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
-        setState(() {
-          widget.bookmarks.remove(bookmark);
-          sharedPreferences.setString(
-              'bookmarks', jsonEncode(widget.bookmarks));
-        });
-        break;
-      default:
-        throw ("The option '$option' is not implemented.");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final Iterable<ListTile> tiles = widget.bookmarks.map((Bookmark bookmark) {
-      return ListTile(
-        title: Text(
-          bookmark.title,
-          style: TextStyle(fontSize: 16.0),
-        ),
-        subtitle: Text(
-          bookmark.url,
-          style: TextStyle(fontSize: 14.0),
-        ),
-        onTap: () => Navigator.pop(context, bookmark.url),
-      );
-    });
-
-    final List<Widget> dividedTiles =
-        ListTile.divideTiles(context: context, tiles: tiles).toList();
-
     final Center emptyContainer =
         Center(child: Text('You haven\'t added any bookmarks yet.'));
 
@@ -87,7 +54,6 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                 )
               ]),
               onTap: () => Navigator.pop(context, bookmark.url),
-              // contentPadding: EdgeInsets.all(8.0),
             ),
           );
         });
