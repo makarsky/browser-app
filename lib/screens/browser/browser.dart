@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:browserapp/models/bookmark.dart';
 import 'package:browserapp/screens/bookmarks/bookmarks.dart';
 import 'package:flutter/material.dart';
+import 'package:rate_my_app/rate_my_app.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
@@ -11,6 +12,10 @@ import 'package:validators/validators.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BrowserScreen extends StatefulWidget {
+  BrowserScreen({Key key, this.rateMyApp}) : super(key: key);
+
+  final RateMyApp rateMyApp;
+
   @override
   _BrowserScreenState createState() => _BrowserScreenState();
 }
@@ -329,7 +334,7 @@ class _BrowserScreenState extends State<BrowserScreen>
               ],
             ),
           ),
-          drawer: NavigationDrawer(),
+          drawer: NavigationDrawer(rateMyApp: widget.rateMyApp),
         ));
   }
 }

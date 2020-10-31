@@ -5,6 +5,10 @@ import 'package:rate_my_app/rate_my_app.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NavigationDrawer extends StatefulWidget {
+  NavigationDrawer({Key key, this.rateMyApp}) : super(key: key);
+
+  final RateMyApp rateMyApp;
+
   @override
   _NavigationDrawerState createState() => _NavigationDrawerState();
 }
@@ -19,8 +23,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       path: 'support@browserapp.com',
       queryParameters: {'subject': 'Issue Report'});
 
-  void _rateMyAppHandler(RateMyApp rateMyApp) {
-    rateMyApp.showStarRateDialog(
+  void _rateMyAppHandler() {
+    widget.rateMyApp.showStarRateDialog(
       context,
       title: 'Rate us!',
       message:
@@ -32,7 +36,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           FlatButton(
             child: Text('Dismiss'),
             onPressed: () async {
-              await rateMyApp.callEvent(RateMyAppEventType.laterButtonPressed);
+              await widget.rateMyApp
+                  .callEvent(RateMyAppEventType.laterButtonPressed);
               Navigator.pop<RateMyAppDialogButton>(
                   context, RateMyAppDialogButton.rate);
             },
@@ -48,7 +53,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ' star(s) !');
               // You can handle the result as you want (for instance if the user puts 1 star then open your contact page, if he puts more then open the store page, etc...).
               // This allows to mimic the behavior of the default "Rate" button. See "Advanced > Broadcasting events" for more information :
-              await rateMyApp.callEvent(RateMyAppEventType.rateButtonPressed);
+              await widget.rateMyApp
+                  .callEvent(RateMyAppEventType.rateButtonPressed);
               Navigator.pop<RateMyAppDialogButton>(
                   context, RateMyAppDialogButton.rate);
             },
@@ -63,12 +69,12 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
         messagePadding: EdgeInsets.only(bottom: 20),
       ),
       starRatingOptions: StarRatingOptions(), // Custom star bar rating options.
-      onDismissed: () => rateMyApp.callEvent(RateMyAppEventType
+      onDismissed: () => widget.rateMyApp.callEvent(RateMyAppEventType
           .laterButtonPressed), // Called when the user dismissed the dialog (either by taping outside or by pressing the "back" button).
     );
   }
 
-  Widget _getDrawer(RateMyApp rateMyApp) {
+  Widget _getDrawer() {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -85,7 +91,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ListTile(
             leading: Icon(Icons.star_rate),
             title: Text('Rate The App'),
-            onTap: () => _rateMyAppHandler(rateMyApp),
+            onTap: () => _rateMyAppHandler(),
           ),
           ListTile(
             leading: Icon(Icons.border_color),
@@ -99,23 +105,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return RateMyAppBuilder(
-      builder: builder,
-      onInitialized: (context, rateMyApp) {
-        setState(() => builder = (context) => _getDrawer(rateMyApp));
-        rateMyApp.conditions.forEach((condition) {
-          if (condition is DebuggableCondition) {
-            print(condition.valuesAsString);
-          }
-        });
-
-        print('Are all conditions met ? ' +
-            (rateMyApp.shouldOpenDialog ? 'Yes' : 'No'));
-
-        if (rateMyApp.shouldOpenDialog) {
-          rateMyApp.showStarRateDialog(context);
-        }
-      },
-    );
+    return RateMyAppBuilder(builder: (context) => _getDrawer());
   }
 }
