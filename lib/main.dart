@@ -19,24 +19,25 @@ class AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return RateMyAppBuilder(
-      builder: builder,
-      onInitialized: (context, rateMyApp) {
-        setState(() => builder = (context) => MaterialApp(
-              title: 'BrowserApp',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-                pageTransitionsTheme: PageTransitionsTheme(builders: {
-                  TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-                }),
-              ),
-              home: BrowserScreen(rateMyApp: rateMyApp),
-            ));
-      },
+    return MaterialApp(
+      title: 'BrowserApp',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        pageTransitionsTheme: PageTransitionsTheme(builders: {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        }),
+      ),
+      home: RateMyAppBuilder(
+          builder: builder,
+          onInitialized: (context, rateMyApp) {
+            setState(
+              () => builder = (context) => BrowserScreen(rateMyApp: rateMyApp),
+            );
+          }),
     );
   }
 
-  static Widget buildProgressIndicator(BuildContext context) =>
-      const Center(child: CircularProgressIndicator());
+  static Widget buildProgressIndicator(BuildContext context) => Container(
+      color: Colors.white, child: Center(child: CircularProgressIndicator()));
 }
