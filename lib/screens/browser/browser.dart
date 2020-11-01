@@ -29,8 +29,7 @@ class _BrowserScreenState extends State<BrowserScreen>
 
   List<Bookmark> _bookmarks = List<Bookmark>();
   double _linearLoaderHeight = 4.0;
-  String _currentUrl =
-      'https://medium.com/nonstopio/tagged/mobile-app-development';
+  String _currentUrl = 'https://google.com';
   String _cachedUrl;
   bool _isCurrentUrlInBookmarks = false;
   bool _isCurrentUrlDirty = false;
@@ -53,10 +52,12 @@ class _BrowserScreenState extends State<BrowserScreen>
           _cachedUrl = sharedPreferences.getString('lastUrl') ?? _currentUrl;
       _textEditingController.value = TextEditingValue(text: _cachedUrl);
       _linearLoaderHeight = 0.0;
-      _bookmarks =
-          (jsonDecode(sharedPreferences.getString('bookmarks')) as List)
+      var encodedBookmarks = sharedPreferences.getString('bookmarks');
+      _bookmarks = encodedBookmarks != null
+          ? (jsonDecode(encodedBookmarks) as List)
               .map((data) => Bookmark.fromJson(data))
-              .toList();
+              .toList()
+          : List();
     });
   }
 
