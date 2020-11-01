@@ -23,10 +23,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       path: 'support@browserapp.com',
       queryParameters: {'subject': 'Issue Report'});
 
-  void _rateMyAppHandler() {
+  void _rateMyAppHandler(context) {
     widget.rateMyApp.showStarRateDialog(
       context,
-      title: 'Rate us!',
+      title: 'Rate The App!',
       message:
           'Do you like this app? Take a little bit of your time to leave a rating:',
       // contentBuilder: (context, defaultContent) => content, // This one allows you to change the default dialog content.
@@ -74,24 +74,35 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     );
   }
 
-  Widget _getDrawer() {
+  Widget _createHeader() {
+    return DrawerHeader(
+        margin: EdgeInsets.zero,
+        padding: EdgeInsets.zero,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+        ),
+        child: Stack(children: <Widget>[
+          Positioned(
+              bottom: 12.0,
+              left: 16.0,
+              child: Text('BrowserApp',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w500))),
+        ]));
+  }
+
+  Widget _getDrawer(context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(
-            child: Text(
-              'Browser',
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-          ),
+          _createHeader(),
           ListTile(
             leading: Icon(Icons.star_rate),
             title: Text('Rate The App'),
-            onTap: () => _rateMyAppHandler(),
+            onTap: () => _rateMyAppHandler(context),
           ),
           ListTile(
             leading: Icon(Icons.border_color),
@@ -105,6 +116,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return RateMyAppBuilder(builder: (context) => _getDrawer());
+    return RateMyAppBuilder(builder: (context) => _getDrawer(context));
   }
 }
