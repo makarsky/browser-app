@@ -39,5 +39,8 @@ class AppState extends State<App> {
   }
 
   static Widget buildProgressIndicator(BuildContext context) => Container(
-      color: Colors.white, child: Center(child: CircularProgressIndicator()));
+      color: Colors.white,
+      child: LinearProgressIndicator(
+          backgroundColor: Colors.white,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white)));
 }
