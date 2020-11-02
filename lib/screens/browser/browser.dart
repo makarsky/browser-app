@@ -104,19 +104,21 @@ class _BrowserScreenState extends State<BrowserScreen>
   void _addCurrentUrlToBookmarks() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
+      _isCurrentUrlInBookmarks = true;
       _controller.future
           .then((WebViewController controller) => controller.getTitle())
           .then((String title) {
         _bookmarks.add(Bookmark(title: title, url: _cachedUrl));
         sharedPreferences.setString('bookmarks', jsonEncode(_bookmarks));
-        _isCurrentUrlInBookmarks = true;
       });
     });
   }
 
-  void _removeCurrentUrlFromBookmarks() {
+  void _removeCurrentUrlFromBookmarks() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       _bookmarks.removeWhere((Bookmark bookmark) => bookmark.url == _cachedUrl);
+      sharedPreferences.setString('bookmarks', jsonEncode(_bookmarks));
       _isCurrentUrlInBookmarks = false;
     });
   }
