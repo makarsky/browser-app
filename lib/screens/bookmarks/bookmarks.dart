@@ -14,6 +14,22 @@ class BookmarksScreen extends StatefulWidget {
 }
 
 class _BookmarksScreenState extends State<BookmarksScreen> {
+  void _deleteBookmark(Bookmark bookmark) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      widget.bookmarks.remove(bookmark);
+      sharedPreferences.setString('bookmarks', jsonEncode(widget.bookmarks));
+    });
+  }
+
+  void _undoBookmarkDeletion(Bookmark bookmark) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      widget.bookmarks.add(bookmark);
+      sharedPreferences.setString('bookmarks', jsonEncode(widget.bookmarks));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Center emptyContainer =
@@ -27,16 +43,15 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
           return Dismissible(
             key: Key(bookmark.url),
             onDismissed: (direction) async {
-              SharedPreferences sharedPreferences =
-                  await SharedPreferences.getInstance();
-              setState(() {
-                widget.bookmarks.remove(bookmark);
-                sharedPreferences.setString(
-                    'bookmarks', jsonEncode(widget.bookmarks));
-              });
+              _deleteBookmark(bookmark);
 
-              Scaffold.of(context)
-                  .showSnackBar(SnackBar(content: Text('Dismissed')));
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text('Deleted'),
+                action: SnackBarAction(
+                  label: 'Undo',
+                  onPressed: () => _undoBookmarkDeletion(bookmark),
+                ),
+              ));
             },
             background: Container(color: Colors.red),
             child: ListTile(
