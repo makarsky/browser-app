@@ -2,8 +2,8 @@
 
 <img src="https://dl.dropboxusercontent.com/s/76tvqyhyokwmuju/browser-app2.gif">
 
-A test Flutter project. It includes the following implementations:
-- a webview
+This is test Flutter project. It includes the following implementations:
+- webview
 - material design
 - dismissible list items
 - "go back" button handling
