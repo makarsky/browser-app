@@ -10,6 +10,7 @@ This is test Flutter project. It includes the following implementations:
 - a drawer
 - opening an email app
 - shared preferences
+- JSON serialization
 
 ## Getting Started
 ```
