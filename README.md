@@ -1,5 +1,7 @@
 # Browser App
 
+<img src="https://dl.dropboxusercontent.com/s/76tvqyhyokwmuju/browser-app2.gif">
+
 A test Flutter project. It includes the following implementations:
 - a webview
 - material design
