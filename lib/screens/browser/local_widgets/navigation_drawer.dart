@@ -1,96 +1,72 @@
-import 'dart:io';
+import 'package:browserapp/screens/browser/local_widgets/rating_stars.dart';
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:rate_my_app/rate_my_app.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NavigationDrawer extends StatefulWidget {
-  NavigationDrawer({Key key, this.rateMyApp}) : super(key: key);
-
-  final RateMyApp rateMyApp;
-
   @override
   _NavigationDrawerState createState() => _NavigationDrawerState();
 }
 
 class _NavigationDrawerState extends State<NavigationDrawer> {
-  WidgetBuilder builder = buildProgressIndicator;
-
-  static Widget buildProgressIndicator(BuildContext context) => const Center();
-
   final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'support@browserapp.com',
       queryParameters: {'subject': 'Issue Report'});
 
-  void _rateMyAppHandler(context) {
-    widget.rateMyApp.showStarRateDialog(
-      context,
-      title: 'Rate The App!',
-      message:
-          'Do you like this app? Take a little bit of your time to leave a rating:',
-      // contentBuilder: (context, defaultContent) => content, // This one allows you to change the default dialog content.
-      actionsBuilder: (context, stars) {
-        // Triggered when the user updates the star rating.
-        return [
+  void _rateUsAppHandler(context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Rate Us!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Do you like this app? Take a little bit of your time to leave a rating:',
+            ),
+            RatingStars(),
+          ],
+        ),
+        actions: <Widget>[
           FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
             child: Text('Dismiss'),
-            onPressed: () async {
-              await widget.rateMyApp
-                  .callEvent(RateMyAppEventType.laterButtonPressed);
-              Navigator.pop<RateMyAppDialogButton>(
-                  context, RateMyAppDialogButton.rate);
-            },
           ),
-          Spacer(
-            flex: 1,
-          ),
+          SizedBox(height: 16),
           FlatButton(
-            child: Text('Rate'),
-            onPressed: () async {
-              print('Thanks for the ' +
-                  (stars == null ? '0' : stars.round().toString()) +
-                  ' star(s) !');
-              // You can handle the result as you want (for instance if the user puts 1 star then open your contact page, if he puts more then open the store page, etc...).
-              // This allows to mimic the behavior of the default "Rate" button. See "Advanced > Broadcasting events" for more information :
-              await widget.rateMyApp
-                  .callEvent(RateMyAppEventType.rateButtonPressed);
-              Navigator.pop<RateMyAppDialogButton>(
-                  context, RateMyAppDialogButton.rate);
-            },
-          )
-        ];
-      },
-      ignoreNativeDialog: Platform
-          .isAndroid, // Set to false if you want to show the Apple's native app rating dialog on iOS or Google's native app rating dialog (depends on the current Platform).
-      dialogStyle: DialogStyle(
-        titleAlign: TextAlign.center,
-        messageAlign: TextAlign.center,
-        messagePadding: EdgeInsets.only(bottom: 20),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Rate!'),
+          ),
+        ],
       ),
-      starRatingOptions: StarRatingOptions(), // Custom star bar rating options.
-      onDismissed: () => widget.rateMyApp.callEvent(RateMyAppEventType
-          .laterButtonPressed), // Called when the user dismissed the dialog (either by taping outside or by pressing the "back" button).
     );
   }
 
   Widget _createHeader() {
     return DrawerHeader(
-        margin: EdgeInsets.zero,
-        padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
-          color: Colors.blue,
-        ),
-        child: Stack(children: <Widget>[
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.zero,
+      decoration: BoxDecoration(
+        color: Colors.blue,
+      ),
+      child: Stack(
+        children: <Widget>[
           Positioned(
-              bottom: 12.0,
-              left: 16.0,
-              child: Text('BrowserApp',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w500))),
-        ]));
+            bottom: 12.0,
+            left: 16.0,
+            child: Text(
+              'BrowserApp',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _getDrawer(context) {
@@ -101,13 +77,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           _createHeader(),
           ListTile(
             leading: Icon(Icons.star_rate),
-            title: Text('Rate The App'),
-            onTap: () => _rateMyAppHandler(context),
+            title: Text('Rate Us!'),
+            onTap: () => _rateUsAppHandler(context),
           ),
           ListTile(
             leading: Icon(Icons.border_color),
             title: Text('Feedback'),
-            onTap: () => {launch(_emailLaunchUri.toString())},
+            onTap: () => launch(_emailLaunchUri.toString()),
           ),
         ],
       ),
@@ -116,6 +92,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return RateMyAppBuilder(builder: (context) => _getDrawer(context));
+    return _getDrawer(context);
   }
 }

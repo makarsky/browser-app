@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:browserapp/models/bookmark.dart';
 import 'package:browserapp/screens/bookmarks/bookmarks.dart';
 import 'package:flutter/material.dart';
-import 'package:rate_my_app/rate_my_app.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
@@ -12,10 +11,6 @@ import 'package:validators/validators.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BrowserScreen extends StatefulWidget {
-  BrowserScreen({Key key, this.rateMyApp}) : super(key: key);
-
-  final RateMyApp rateMyApp;
-
   @override
   _BrowserScreenState createState() => _BrowserScreenState();
 }
@@ -220,124 +215,133 @@ class _BrowserScreenState extends State<BrowserScreen>
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: _onBackPressed,
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false, // Removes the default drawer icon
-            title: TextField(
-                style: TextStyle(fontSize: 14),
-                autofocus: false,
-                keyboardType: TextInputType.url,
-                maxLines: 1,
-                controller: _textEditingController,
-                onTap: () => _textEditingController.selection = TextSelection(
-                    baseOffset: 0,
-                    extentOffset: _textEditingController.text.length),
-                onChanged: (String newUrl) {
-                  setState(() {
-                    _currentUrl = newUrl.trim();
-                    _isCurrentUrlDirty = _currentUrl != _cachedUrl;
-                  });
+      onWillPop: _onBackPressed,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Removes the default drawer icon
+          title: TextField(
+            style: TextStyle(fontSize: 14),
+            autofocus: false,
+            keyboardType: TextInputType.url,
+            maxLines: 1,
+            controller: _textEditingController,
+            onTap: () => _textEditingController.selection = TextSelection(
+              baseOffset: 0,
+              extentOffset: _textEditingController.text.length,
+            ),
+            onChanged: (String newUrl) {
+              setState(() {
+                _currentUrl = newUrl.trim();
+                _isCurrentUrlDirty = _currentUrl != _cachedUrl;
+              });
+            },
+            onSubmitted: _updateWebView,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(50.0),
+                ),
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(50.0),
+                ),
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.only(
+                  top: 10.0, bottom: 10.0, left: 15.0, right: 15.0),
+            ),
+          ),
+          actions: <Widget>[
+            RotationTransition(
+              turns: Tween(begin: 0.0, end: 1.0)
+                  .animate(_refreshIconRotationController),
+              child: IconButton(
+                icon: Icon(_isCurrentUrlDirty ? Icons.forward : Icons.refresh),
+                onPressed: _updateWebView,
+              ),
+            ),
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert),
+              onSelected: _triggerOption,
+              itemBuilder: (BuildContext context) {
+                return Constants.OPTIONS.keys.map((key) {
+                  return PopupMenuItem(
+                    child: Text(Constants.OPTIONS[key]),
+                    value: Constants.OPTIONS[key],
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
+        body: Stack(
+          children: <Widget>[
+            _getBody(),
+            Align(
+              alignment: Alignment.topCenter,
+              child: AnimatedContainer(
+                curve: Curves.easeInOut,
+                height: _linearLoaderHeight,
+                duration: Duration(milliseconds: 200),
+                child: LinearProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  backgroundColor: Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              FutureBuilder<WebViewController>(
+                future: _controller.future,
+                builder: (BuildContext context,
+                    AsyncSnapshot<WebViewController> controller) {
+                  return IconButton(
+                    disabledColor: Colors.grey,
+                    icon: Icon(Icons.chevron_left),
+                    onPressed: _canGoBack ? controller.data.goBack : null,
+                  );
                 },
-                onSubmitted: _updateWebView,
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(50.0),
-                      ),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(50.0),
-                      ),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.only(
-                        top: 10.0, bottom: 10.0, left: 15.0, right: 15.0))),
-            actions: <Widget>[
-              RotationTransition(
-                  turns: Tween(begin: 0.0, end: 1.0)
-                      .animate(_refreshIconRotationController),
-                  child: IconButton(
-                    icon: Icon(
-                        _isCurrentUrlDirty ? Icons.forward : Icons.refresh),
-                    onPressed: _updateWebView,
-                  )),
-              PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert),
-                onSelected: _triggerOption,
-                itemBuilder: (BuildContext context) {
-                  return Constants.OPTIONS.keys.map((key) {
-                    return PopupMenuItem(
-                      child: Text(Constants.OPTIONS[key]),
-                      value: Constants.OPTIONS[key],
-                    );
-                  }).toList();
+              ),
+              FutureBuilder<WebViewController>(
+                future: _controller.future,
+                builder: (BuildContext context,
+                    AsyncSnapshot<WebViewController> controller) {
+                  return IconButton(
+                    disabledColor: Colors.grey,
+                    icon: Icon(Icons.chevron_right),
+                    onPressed: _canGoForward ? controller.data.goForward : null,
+                  );
                 },
+              ),
+              IconButton(
+                icon: Icon(_isCurrentUrlInBookmarks
+                    ? Icons.bookmark
+                    : Icons.bookmark_border),
+                onPressed: () {
+                  _isCurrentUrlInBookmarks
+                      ? _removeCurrentUrlFromBookmarks()
+                      : _addCurrentUrlToBookmarks();
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.list),
+                onPressed: _viewBookmarks,
               ),
             ],
           ),
-          body: Stack(children: <Widget>[
-            _getBody(),
-            Align(
-                alignment: Alignment.topCenter,
-                child: AnimatedContainer(
-                    curve: Curves.easeInOut,
-                    height: _linearLoaderHeight,
-                    duration: Duration(milliseconds: 200),
-                    child: LinearProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      backgroundColor: Colors.blue,
-                    ))),
-          ]),
-          bottomNavigationBar: BottomAppBar(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                FutureBuilder<WebViewController>(
-                    future: _controller.future,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<WebViewController> controller) {
-                      return IconButton(
-                        disabledColor: Colors.grey,
-                        icon: Icon(Icons.chevron_left),
-                        onPressed: _canGoBack ? controller.data.goBack : null,
-                      );
-                    }),
-                FutureBuilder<WebViewController>(
-                    future: _controller.future,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<WebViewController> controller) {
-                      return IconButton(
-                        disabledColor: Colors.grey,
-                        icon: Icon(Icons.chevron_right),
-                        onPressed:
-                            _canGoForward ? controller.data.goForward : null,
-                      );
-                    }),
-                IconButton(
-                  icon: Icon(_isCurrentUrlInBookmarks
-                      ? Icons.bookmark
-                      : Icons.bookmark_border),
-                  onPressed: () {
-                    _isCurrentUrlInBookmarks
-                        ? _removeCurrentUrlFromBookmarks()
-                        : _addCurrentUrlToBookmarks();
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.list),
-                  onPressed: _viewBookmarks,
-                ),
-              ],
-            ),
-          ),
-          drawer: NavigationDrawer(rateMyApp: widget.rateMyApp),
-        ));
+        ),
+        drawer: NavigationDrawer(),
+      ),
+    );
   }
 }

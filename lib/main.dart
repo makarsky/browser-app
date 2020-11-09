@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rate_my_app/rate_my_app.dart';
 import './screens/browser/browser.dart';
 
 void main() {
@@ -15,8 +14,6 @@ class App extends StatefulWidget {
 }
 
 class AppState extends State<App> {
-  WidgetBuilder builder = buildProgressIndicator;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,19 +25,7 @@ class AppState extends State<App> {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
         }),
       ),
-      home: RateMyAppBuilder(
-          builder: builder,
-          onInitialized: (context, rateMyApp) {
-            setState(
-              () => builder = (context) => BrowserScreen(rateMyApp: rateMyApp),
-            );
-          }),
+      home: BrowserScreen(),
     );
   }
-
-  static Widget buildProgressIndicator(BuildContext context) => Container(
-      color: Colors.white,
-      child: LinearProgressIndicator(
-          backgroundColor: Colors.white,
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white)));
 }
