@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:browserapp/models/bookmark.dart';
 import 'package:browserapp/screens/bookmarks/bookmarks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
@@ -73,6 +74,9 @@ class _BrowserScreenState extends State<BrowserScreen>
 
   void onPageStarted(String url) {
     setState(() {
+      // Closes the keyboard
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+
       _linearLoaderHeight = 4.0;
       _cachedUrl = _currentUrl = url;
       _isCurrentUrlDirty = false;
