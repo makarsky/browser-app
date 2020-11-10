@@ -45,13 +45,15 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
             onDismissed: (direction) async {
               _deleteBookmark(bookmark);
 
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text('Deleted'),
-                action: SnackBarAction(
-                  label: 'Undo',
-                  onPressed: () => _undoBookmarkDeletion(bookmark),
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Deleted'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () => _undoBookmarkDeletion(bookmark),
+                  ),
                 ),
-              ));
+              );
             },
             background: Container(color: Colors.red),
             child: ListTile(
@@ -59,31 +61,35 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                 bookmark.title,
                 style: TextStyle(fontSize: 16.0),
               ),
-              subtitle: new Column(children: <Widget>[
-                Text(
-                  bookmark.url,
-                  style: TextStyle(fontSize: 14.0),
-                ),
-                new Divider(
-                  height: 12.0,
-                )
-              ]),
+              subtitle: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    bookmark.url,
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  new Divider(
+                    height: 12.0,
+                  )
+                ],
+              ),
               onTap: () => Navigator.pop(context, bookmark.url),
             ),
           );
         });
 
     return WillPopScope(
-        onWillPop: () async {
-          if (Navigator.of(context).userGestureInProgress)
-            return false;
-          else
-            return true;
-        },
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text(Constants.OPTION_BOOKMARKS),
-            ),
-            body: widget.bookmarks.isEmpty ? emptyContainer : listView));
+      onWillPop: () async {
+        if (Navigator.of(context).userGestureInProgress)
+          return false;
+        else
+          return true;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(Constants.OPTION_BOOKMARKS),
+          ),
+          body: widget.bookmarks.isEmpty ? emptyContainer : listView),
+    );
   }
 }
