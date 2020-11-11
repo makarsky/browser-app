@@ -35,7 +35,10 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
     final Center emptyContainer =
         Center(child: Text('You haven\'t added any bookmarks yet.'));
 
-    Widget listView = ListView.builder(
+    Widget listView = ListView.separated(
+        separatorBuilder: (context, index) => Divider(
+              height: 0,
+            ),
         itemCount: widget.bookmarks.length,
         itemBuilder: (context, index) {
           final bookmark = widget.bookmarks[index];
@@ -47,7 +50,11 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
 
               Scaffold.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Deleted'),
+                  content: Text(
+                    'Deleted "${bookmark.title}"',
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   action: SnackBarAction(
                     label: 'Undo',
                     onPressed: () => _undoBookmarkDeletion(bookmark),
@@ -61,17 +68,13 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                 bookmark.title,
                 style: TextStyle(fontSize: 16.0),
               ),
-              subtitle: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    bookmark.url,
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  new Divider(
-                    height: 12.0,
-                  )
-                ],
+              subtitle: Text(
+                bookmark.url,
+                style: TextStyle(
+                  fontSize: 14.0,
+                ),
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
               ),
               onTap: () => Navigator.pop(context, bookmark.url),
             ),
