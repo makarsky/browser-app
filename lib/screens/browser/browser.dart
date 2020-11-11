@@ -107,7 +107,7 @@ class _BrowserScreenState extends State<BrowserScreen>
       _controller.future
           .then((WebViewController controller) => controller.getTitle())
           .then((String title) {
-        _bookmarks.add(Bookmark(title: title, url: _cachedUrl));
+        _bookmarks.insert(0, Bookmark(title: title, url: _cachedUrl));
         sharedPreferences.setString('bookmarks', jsonEncode(_bookmarks));
       });
     });

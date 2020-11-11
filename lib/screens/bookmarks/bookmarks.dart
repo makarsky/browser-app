@@ -25,7 +25,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
   void _undoBookmarkDeletion(Bookmark bookmark) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      widget.bookmarks.add(bookmark);
+      widget.bookmarks.insert(0, bookmark);
       sharedPreferences.setString('bookmarks', jsonEncode(widget.bookmarks));
     });
   }
