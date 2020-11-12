@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:browserapp/models/bookmark.dart';
+import 'package:browserapp/screens/bookmarks/local_widgets/vertical_progress_bar.dart';
 import 'package:flutter/material.dart';
 import '../../classes/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,8 @@ class BookmarksScreen extends StatefulWidget {
   _BookmarksScreenState createState() => _BookmarksScreenState();
 }
 
-class _BookmarksScreenState extends State<BookmarksScreen> {
+class _BookmarksScreenState extends State<BookmarksScreen>
+    with SingleTickerProviderStateMixin {
   void _deleteBookmark(Bookmark bookmark) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
@@ -50,10 +52,17 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
 
               Scaffold.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    'Deleted "${bookmark.title}"',
-                    softWrap: false,
-                    overflow: TextOverflow.ellipsis,
+                  content: Row(
+                    children: [
+                      VerticalProgressBar(),
+                      Expanded(
+                        child: Text(
+                          'Deleting "${bookmark.title}"',
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                   action: SnackBarAction(
                     label: 'Undo',
