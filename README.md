@@ -1,6 +1,6 @@
 # Browser App
 
-<img src="https://dl.dropboxusercontent.com/s/76tvqyhyokwmuju/browser-app2.gif">
+<img src="https://dl.dropbox.com/s/3c0d7eigmdc232m/browser-app3.gif">
 
 This is test Flutter project. It includes the following implementations:
 - webview
