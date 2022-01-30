@@ -73,3 +73,6 @@ https://habr.com/ru/post/485002/
 
 Icon generator  
 https://romannurik.github.io/AndroidAssetStudio/icons-launcher.html#foreground.type=clipart&foreground.clipart=bookmarks&foreground.space.trim=1&foreground.space.pad=0.3&foreColor=rgb(255%2C%20255%2C%20255)&backColor=rgb(0%2C%20188%2C%20212)&crop=0&backgroundShape=square&effects=shadow&name=ic_launcher
+
+Flutter circular countdown timer
+https://medium.com/flutterdevs/creating-a-countdown-timer-using-animation-in-flutter-2d56d4f3f5f1
